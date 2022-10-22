@@ -1,0 +1,17 @@
+{
+  "manifest_version": 3,
+  "name": "Hello World",
+  "version": "2.1",
+  "minimum_chrome_version": "23",
+  "icons": {
+    "16": "icon_16.png",
+    "128": "icon_128.png"
+  },
+  "content_scripts": [
+    {
+      "matches": ["https://*.twitter.com/*"],
+      "css": ["my-styles.css"],
+      "js": ["content-script.js"]
+    }
+  ]
+}
