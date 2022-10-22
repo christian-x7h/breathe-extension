@@ -1,3 +1,53 @@
+#eBody {
+  background: rgb(32 32 32);
+  width:      100%;
+  height:     100%;
+  z-index:    1000000000;
+  top:        0;
+  left:       0;
+  position:   fixed;
+}
+
+#eBody h1 {
+  position: absolute;
+  bottom: 55%;
+  text-align: center;
+  width: 100%;
+  line-height: 120%;
+  font-family: Arial, sans-serif;
+  color: #fefefe;
+  letter-spacing: 0.025em;
+}
+
+/* CSS Animation that slide in the body from the bottom */
+#eBreathOverlay {
+  background: rgb(130 130 130);
+  width:      100%;
+  height:     100%;
+  z-index:    1000000001;
+  top:        0;
+  left:       0;
+  position:   fixed;
+
+  animation-name: slide;
+  animation-duration: 10s;
+  animation-iteration-count: 1;
+  animation-fill-mode: both;
+}
+
+@keyframes slide {
+  from {
+    transform: translateY(100%);
+  }
+  60% {
+    transform: translateY(0%);
+  }
+  to {
+      transform: translateY(100%);
+    }
+}
+
+/*
 html, body {
   height: 100%;
 }
@@ -20,3 +70,4 @@ h1 {
   color: rgb(66,66,66);
   letter-spacing: -0.05em;
 }
+*/

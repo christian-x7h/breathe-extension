@@ -9,9 +9,26 @@
   },
   "content_scripts": [
     {
-      "matches": ["https://*.twitter.com/*"],
-      "css": ["my-styles.css"],
-      "js": ["content-script.js"]
+      "matches": [
+        "https://*.twitter.com/*"
+      ],
+      "css": [
+        "styles/main.css"
+      ],
+      "js": [
+        "lib/jquery-3.6.1.min.js",
+        "content-script.js"
+      ]
+    }
+  ],
+  "web_accessible_resources": [
+    {
+      "resources": [
+        "views/*"
+      ],
+      "matches": [
+        "<all_urls>"
+      ]
     }
   ]
 }
