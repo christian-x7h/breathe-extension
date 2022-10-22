@@ -6,21 +6,44 @@
   top:        0;
   left:       0;
   position:   fixed;
+
+  font-family: Arial, sans-serif;
+  letter-spacing: 0.025em;
 }
 
-#eBody h1 {
+#eBody.eBody_postBreath {
+    background: #7f5a83;
+    background-image: linear-gradient(0deg, #7f5a83 0%, #0d324d 74%);
+}
+
+#breathMessage {
   position: absolute;
   bottom: 55%;
   text-align: center;
   width: 100%;
   line-height: 120%;
-  font-family: Arial, sans-serif;
   color: #fefefe;
-  letter-spacing: 0.025em;
 }
 
-/* CSS Animation that slide in the body from the bottom */
-#eBreathOverlay {
+#decisionNav {
+  position: absolute;
+  bottom: 5%;
+  text-align: center;
+  width: 100%;
+  color: #fefefe;
+  display:none;
+}
+
+#decisionNav p {
+    margin: 25px;
+}
+
+#decisionNav p:hover {
+    color: #e6e6e6;
+    cursor: pointer;
+}
+
+.eBreathOverlay {
   background: rgb(130 130 130);
   width:      100%;
   height:     100%;
@@ -28,24 +51,118 @@
   top:        0;
   left:       0;
   position:   fixed;
+}
 
-  animation-name: slide;
-  animation-duration: 10s;
+#eBreathOverlay_slideIn {
+  animation-name: slideIn;
+  animation-duration: 6s;
+  animation-easing: ease-in-out;
   animation-iteration-count: 1;
   animation-fill-mode: both;
 }
 
-@keyframes slide {
+#eBreathOverlay_slideOut {
+  animation-name: slideOut;
+  animation-duration: 12s;
+  animation-easing: ease-in;
+  animation-iteration-count: 1;
+  animation-fill-mode: both;
+}
+
+@keyframes slideIn {
   from {
     transform: translateY(100%);
   }
-  60% {
+  to {
+    transform: translateY(0%);
+  }
+}
+
+@keyframes slideOut {
+  from {
+    transform: translateY(100%);
+  }
+  50% {
     transform: translateY(0%);
   }
   to {
       transform: translateY(100%);
     }
 }
+
+/* Start Button CSS */
+.button-85 {
+  font-size: large;
+  padding: 1em 2em;
+  border: none;
+  outline: none;
+  color: black;
+  background: white;
+  cursor: pointer;
+  position: relative;
+  z-index: 0;
+  border-radius: 10px;
+  user-select: none;
+  -webkit-user-select: none;
+  touch-action: manipulation;
+}
+
+.button-85:before {
+  content: "";
+  background: linear-gradient(
+    45deg,
+    #ff0000,
+    #ff7300,
+    #fffb00,
+    #48ff00,
+    #00ffd5,
+    #002bff,
+    #7a00ff,
+    #ff00c8,
+    #ff0000
+  );
+  position: absolute;
+  top: -2px;
+  left: -2px;
+  background-size: 400%;
+  z-index: -1;
+  filter: blur(5px);
+  -webkit-filter: blur(5px);
+  width: calc(100% + 4px);
+  height: calc(100% + 4px);
+  animation: glowing-button-85 20s linear infinite;
+  transition: opacity 0.3s ease-in-out;
+  border-radius: 10px;
+}
+
+@keyframes glowing-button-85 {
+  0% {
+    background-position: 0 0;
+  }
+  50% {
+    background-position: 400% 0;
+  }
+  100% {
+    background-position: 0 0;
+  }
+}
+
+.button-85:after {
+  z-index: -1;
+  content: "";
+  position: absolute;
+  width: 100%;
+  height: 100%;
+  background: white;
+  left: 0;
+  top: 0;
+  border-radius: 10px;
+}
+/* End Button CSS */
+
+
+
+
 
 /*
 html, body {
