@@ -64,5 +64,9 @@ storeAttempt()
                 const prefix = attemptsCount === 1 ? 'time' : 'times';
                 $('#attemptsText').text(prefix + ' you have opened ' + domain + ' today');
             });
+            
+            $('#abortButton').on('click', () => {
+                chrome.runtime.sendMessage({ closeTab: true });
+            });
         });
     });
