@@ -1,3 +1,7 @@
+// TODO
+// pause animations if tab is not active, shrink continue tap target, clean up repo of unrelated assets, add config of domains to block
+// https://stackoverflow.com/a/53021335/1044565
+
 const getDomain = () => {
     return psl.get(window.location.hostname);
 }
