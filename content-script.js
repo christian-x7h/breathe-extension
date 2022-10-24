@@ -1,5 +1,5 @@
 const getDomain = () => {
-    return psl.parse(window.location.hostname);
+    return psl.get(window.location.hostname);
 }
 
 const getKey = (domain) => {
@@ -15,44 +15,54 @@ const lessThan24HoursAgo = (timestamp) => {
 const storeAttempt = () => {
     const domain = getDomain();
     const storageKey = getKey(domain)
-    // Model: { domain: { count: 0, timestamp: 0 } }
-    const domainAttempts = chrome.storage.sync.get(storageKey);
-
-    if (domainAttempts && lessThan24HoursAgo(domainAttempts.timestamp)) {
-        const newDomainAttempts = parseInt(domainAttempts.count) + 1;
-        let storageObj = {};
-        storageObj[storageKey] = { count: newDomainAttempts, timestamp: Date.now() }
-        chrome.storage.sync.set(storageObj);
-    } else {
-        let storageObj = {};
-        storageObj[storageKey] = { count: 1, timestamp: Date.now() }
-        chrome.storage.sync.set(storageObj);
-    }
+    // DomainAttempts Model: { domain: { count: 0, timestamp: 0 } }
+    return chrome.storage.sync.get(storageKey)
+        .then((result) => {
+            const domainAttempt = result[storageKey];
+            let data = {};
+            if (domainAttempt && lessThan24HoursAgo(domainAttempt.timestamp)) {
+                data = { count: parseInt(domainAttempt.count) + 1, timestamp: Date.now() }
+            } else {
+                data = { count: 1, timestamp: Date.now() }
+            }
+            let updatedData = {};
+            updatedData[storageKey] = data;
+            return chrome.storage.sync.set(updatedData);
+        });
 }
 
-const getDomainAttempts = () => {
+const getAttemptsCount = () => {
     const domain = getDomain();
-    const domainAttempts = chrome.storage.sync.get(getKey(domain));
-    return domainAttempts.count;
-}
-
-const onViewLoad = () => {
-    $('#eBreathOverlay_slideIn').on('animationend', function(){
-        $('#eBreathOverlay_slideIn').css('display', 'none');
-        $('#eBody').addClass('eBody_postBreath');
-        $('#decisionNav').css('display', 'block');
-        $('#breathMessage').css('display', 'none');
-        const attempts = getDomainAttempts()
-        const domain = getDomain();
-        $('#attemptsCount').text(attempts);
-        const prefix = attempts === 1 ? 'time' : 'times';
-        $('#attemptsText').text(prefix + ' you have opened ' + domain + ' today');
+    const storageKey = getKey(domain);
+    return chrome.storage.sync.get(storageKey).then((result) => {
+        return result[storageKey].count;
     });
 }
 
-storeAttempt();
+storeAttempt()
+    .then(() => {
+        const d = $.Deferred();
+        $(document).ready(() => d.resolve());
+        return d;
+    })
+    .then(() => {
+        const d = $.Deferred();
+        $('body').load(chrome.runtime.getURL('views/main.html'), () => d.resolve());
+        return d;
+    })
+    .then(() => {
 
-$(document).ready(function() {
-    // Append main extension div to body
-    var extensionOverlay = $('body').load(chrome.runtime.getURL('views/main.html'), onViewLoad);
-});
+        $('#eBreathOverlay_slideIn').on('animationend', () => {
+            $('#eBreathOverlay_slideIn').css('display', 'none');
+            $('#eBody').addClass('eBody_postBreath');
+            $('#decisionNav').css('display', 'block');
+            $('#breathMessage').css('display', 'none');
+
+            getAttemptsCount().then((attemptsCount) => {
+                $('#attemptsCount').text(attemptsCount);
+                const domain = getDomain();
+                const prefix = attemptsCount === 1 ? 'time' : 'times';
+                $('#attemptsText').text(prefix + ' you have opened ' + domain + ' today');
+            });
+        });
+    });
