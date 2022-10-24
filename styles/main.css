@@ -16,7 +16,7 @@
     background-image: linear-gradient(0deg, #7f5a83 0%, #0d324d 74%);
 }
 
-#breathMessage {
+.mainContent {
   position: absolute;
   bottom: 55%;
   text-align: center;
