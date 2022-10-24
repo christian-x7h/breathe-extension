@@ -47,7 +47,10 @@ storeAttempt()
     })
     .then(() => {
         const d = $.Deferred();
-        $('body').load(chrome.runtime.getURL('views/main.html'), () => d.resolve());
+        $.get(chrome.runtime.getURL('views/main.html'), (data) => {
+            $('body').prepend(data);
+            d.resolve();
+        });
         return d;
     })
     .then(() => {
@@ -64,9 +67,13 @@ storeAttempt()
                 const prefix = attemptsCount === 1 ? 'time' : 'times';
                 $('#attemptsText').text(prefix + ' you have opened ' + domain + ' today');
             });
-            
+
             $('#abortButton').on('click', () => {
                 chrome.runtime.sendMessage({ closeTab: true });
+            });
+
+            $('#continueButton').on('click', () => {
+                $('#eBody').remove();
             });
         });
     });
