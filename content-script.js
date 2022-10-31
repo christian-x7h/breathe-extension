@@ -1,5 +1,5 @@
 // TODO
-// pause animations if tab is not active, shrink continue tap target, clean up repo of unrelated assets, add config of domains to block
+// shrink continue tap target, clean up repo of unrelated assets, add config of domains to block
 // https://stackoverflow.com/a/53021335/1044565
 
 const getDomain = () => {
@@ -59,6 +59,14 @@ storeAttempt()
     })
     .then(() => {
 
+        // Toggle animation on tab visibility change, does not seem to work reliably
+        $(document).on('visibilitychange', () => {     
+            const overlays = $('.eBreathOverlay');
+            const toggle = overlays.css('animation-play-state') === 'running' ? 'paused' : 'running';
+            overlays.css('animation-play-state', toggle);
+        });
+
+        // Setup UI behavior
         $('#eBreathOverlay_slideIn').on('animationend', () => {
             $('#eBreathOverlay_slideIn').css('display', 'none');
             $('#eBody').addClass('eBody_postBreath');

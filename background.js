@@ -1,3 +1,4 @@
+// Listen for tab close event
 chrome.runtime.onMessage.addListener(
     function (request, sender, sendResponse) {
         if (request.closeTab === true) {
