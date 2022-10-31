@@ -1,6 +1,19 @@
 // TODO
-// shrink continue tap target, clean up repo of unrelated assets, add config of domains to block
+// add icons, debug css priority in certain pages (e.g. reddit.com, instagram.com)
 // https://stackoverflow.com/a/53021335/1044565
+
+const getInterceptDomains = () => {
+    return new Promise((resolve, reject) => {
+        chrome.storage.sync.get('activeDomains', (result) => {
+            const activeDomains = result.activeDomains;
+            if (activeDomains && activeDomains.length > 0) {
+                resolve(activeDomains);
+            } else {
+                reject('');
+            }
+        });
+    });
+};
 
 const getDomain = () => {
     return psl.get(window.location.hostname);
@@ -43,7 +56,16 @@ const getAttemptsCount = () => {
     });
 }
 
-storeAttempt()
+
+getInterceptDomains()
+    .then((activeDomains) => {
+        const domain = getDomain();
+        if (!activeDomains.includes(domain)) {
+            return Promise.reject();
+        }
+        return Promise.resolve();
+    })
+    .then(() => storeAttempt())
     .then(() => {
         const d = $.Deferred();
         $(document).ready(() => d.resolve());

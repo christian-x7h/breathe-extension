@@ -1,0 +1,15 @@
+body { 
+    margin: 10px;
+}
+
+.optionGroup * {
+    display: block;
+    margin: 10px;
+}
+
+#submitButtons {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 100%;
+}
