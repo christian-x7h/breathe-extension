@@ -8,3 +8,19 @@ chrome.runtime.onMessage.addListener(
         }
     }
 );
+
+// Listen for tab open events
+chrome.tabs.onUpdated.addListener(function () {
+    let queryOptions = { active: true, currentWindow: true };
+    chrome.tabs.query(queryOptions).then((tabs) => {
+        const tabId = tabs[0].id;
+        const tabOpenerId = tabs[0].openerId;
+        const msg = {
+            tabId: tabId,
+            tabOpenerId: tabOpenerId
+        }
+        chrome.tabs.sendMessage(tabId, msg, function (response) {
+            console.log(response.farewell);
+        });
+    });
+})
