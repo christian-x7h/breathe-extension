@@ -1,5 +1,5 @@
-chrome.storage.sync.get('activeDomains', (result) => {
-    const activeDomains = result.activeDomains;
+chrome.storage.sync.get('options', (result) => {
+    const activeDomains = result.options?.activeDomains;
     if (activeDomains && activeDomains.length > 0) {
         $('#domains').val(activeDomains.join(', '))
     }
@@ -12,7 +12,7 @@ $('#button').on('click', () => {
         return domain.trim();
     });
     if (trimmedDomainsArray.length > 0) {
-        chrome.storage.sync.set({ activeDomains: trimmedDomainsArray }, () => {
+        chrome.storage.sync.set({ options: { activeDomains: trimmedDomainsArray } }, () => {
             $('#button').text('Saved!');
             setTimeout(() => {
                 $('#button').text('Save');

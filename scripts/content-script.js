@@ -1,92 +1,23 @@
 // TODO
-// add icons, debug css priority in certain pages (e.g. reddit.com, instagram.com)
-// https://stackoverflow.com/a/53021335/1044565
+// add icons, debug css font priority in certain pages (reddit, instagram), add Alarm with Alarm API for break reminders
 
-let currentTabId = null;
-
-const getInterceptDomains = async () => {
-    return new Promise((resolve, reject) => {
-        chrome.storage.sync.get('activeDomains', (result) => {
-            const activeDomains = result.activeDomains;
-            if (activeDomains && activeDomains.length > 0) {
-                resolve(activeDomains);
-            } else {
-                reject('');
-            }
-        });
-    });
-};
-
-const getDomain = () => {
-    return psl.get(window.location.hostname);
-}
-
-const getKey = (domain) => {
-    return domain + '_attempts';
-}
-
-const lessThan24HoursAgo = (timestamp) => {
-    const now = Date.now();
-    const diff = now - timestamp;
-    return diff < 86400000;
-}
-
-const storeAttempt = () => {
-    const domain = getDomain();
-    const storageKey = getKey(domain)
-    // DomainAttempts Model: { domain: { count: 0, timestamp: 0 } }
-    return chrome.storage.sync.get(storageKey)
-        .then((result) => {
-            const domainAttempt = result[storageKey];
-            let data = {};
-            if (domainAttempt && lessThan24HoursAgo(domainAttempt.timestamp)) {
-                data = { count: parseInt(domainAttempt.count) + 1, timestamp: Date.now() }
-            } else {
-                data = { count: 1, timestamp: Date.now() }
-            }
-            let updatedData = {};
-            updatedData[storageKey] = data;
-            return chrome.storage.sync.set(updatedData);
-        });
-}
-
-const getAttemptsCount = () => {
-    const domain = getDomain();
-    const storageKey = getKey(domain);
-    return chrome.storage.sync.get(storageKey).then((result) => {
-        return result[storageKey].count;
-    });
+const getAttemptsCount = async (domain) => {
+    const data = await chrome.storage.sync.get('domainAttempts');
+    return data.domainAttempts[domain].count;
 }
 
 chrome.runtime.onMessage.addListener((request, sender) => {
-    console.log(`${JSON.stringify(request)} from ${JSON.stringify(sender)}`);
-
-    // If first open, continue
-    if (currentTabId === null) {
-        console.log('first open');
-        currentTabId = request.tabId;
-        getInterceptDomains()
-            .then((activeDomains) => {
-                const domain = getDomain();
-                if (!activeDomains.includes(domain)) {
-                    return Promise.reject();
-                }
-                return Promise.resolve();
-            })
-            .then(() => storeAttempt())
-            .then(() => {
-                const d = $.Deferred();
-                $(document).ready(() => d.resolve());
-                return d;
-            })
-            .then(() => {
-                const d = $.Deferred();
+    const type = request.type;
+    const domain = request.tabUrlDomain;
+    
+    if (type === 'triggerOverlay') {
+        new Promise((resolve, reject) => $(document).ready(() => resolve()))
+            .then(() => new Promise((resolve, reject) => {
                 $.get(chrome.runtime.getURL('views/main.html'), (data) => {
                     $('body').prepend(data);
-                    d.resolve();
+                    resolve();
                 });
-                return d;
-            })
+            }))
             .then(() => {
 
                 // Toggle animation on tab visibility change, does not seem to work reliably
@@ -102,10 +33,9 @@ chrome.runtime.onMessage.addListener((request, sender) => {
                     $('#eBody').addClass('eBody_postBreath');
                     $('#decisionNav').css('display', 'block');
                     $('#breathMessage').css('display', 'none');
-
-                    getAttemptsCount().then((attemptsCount) => {
+                    
+                    getAttemptsCount(domain).then((attemptsCount) => {
                         $('#attemptsCount').text(attemptsCount);
-                        const domain = getDomain();
                         const prefix = attemptsCount === 1 ? 'time' : 'times';
                         $('#attemptsText').text(prefix + ' you have opened ' + domain + ' today');
                     });
@@ -118,14 +48,7 @@ chrome.runtime.onMessage.addListener((request, sender) => {
                         $('#eBody').remove();
                     });
                 });
-            });
-    }
-
-    // If not first open, and same tab, don't continue
-    if (currentTabId === request.tabId) {
-        console.log('not first open');
-        return;
+            })
+            .catch(e => console.log(`Promise exception caught: ${e}`));
     }
 });
-
-
